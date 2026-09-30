@@ -1,0 +1,513 @@
+<title>Тест скрытых ассоциаций</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Макет: приборная панель. Экран теста — герой страницы; вокруг него узкая колонка пояснений. */
+:root{
+  --bg:#F4F6F7; --surface:#FFFFFF; --ink:#101A2B; --muted:#5A6B7C;
+  --line:#CFD8DE; --sand:#C9B48D; --accent:#9C2A21;
+  --left:#1F5F73; --right:#8A3A2E;
+  --font-display:'PT Serif', Cambria, Georgia, serif;
+  --font-ui:'IBM Plex Sans', Calibri, 'Segoe UI', system-ui, sans-serif;
+  --font-mono:'IBM Plex Mono', ui-monospace, 'Courier New', monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#101A2B; --surface:#182538; --ink:#EAEFF3; --muted:#9FB0BE;
+  --line:#2C3C50; --sand:#D6C29C; --accent:#E2685A;
+  --left:#6FBDD2; --right:#E2897A; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#101A2B; --surface:#182538; --ink:#EAEFF3; --muted:#9FB0BE;
+  --line:#2C3C50; --sand:#D6C29C; --accent:#E2685A;
+  --left:#6FBDD2; --right:#E2897A; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-ui);
+     font-size:16px;line-height:1.6;margin:0}
+.wrap{max-width:860px;margin:0 auto;padding-inline:20px;padding-block:32px 56px}
+h1{font-family:var(--font-display);font-size:clamp(28px,5vw,42px);line-height:1.15;
+   margin:0 0 12px;text-wrap:balance;font-weight:700}
+h2{font-family:var(--font-display);font-size:clamp(20px,3vw,26px);margin:32px 0 10px;
+   text-wrap:balance}
+p{margin:0 0 14px;max-width:66ch}
+.lede{font-size:18px;color:var(--muted);max-width:60ch}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;
+      padding:22px;margin:18px 0}
+/* мотив презентации: тезис с квадратным маркером песочного цвета */
+ul.marks{list-style:none;padding:0;margin:0}
+ul.marks li{position:relative;padding-left:26px;margin-bottom:10px}
+ul.marks li::before{content:"";position:absolute;left:0;top:.55em;width:10px;height:10px;
+  background:var(--sand)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.grid2>*{min-width:0}
+button{font:inherit;font-weight:600;cursor:pointer;border-radius:8px;
+       border:1px solid var(--ink);background:var(--ink);color:var(--bg);
+       padding:13px 20px}
+button.ghost{background:transparent;color:var(--ink)}
+button:focus-visible,a:focus-visible{outline:3px solid var(--left);outline-offset:2px}
+.note{font-size:14px;color:var(--muted)}
+dl.spec{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin:0;font-size:15px}
+dl.spec dt{color:var(--muted)}
+dl.spec dd{margin:0;font-variant-numeric:tabular-nums}
+.tag{display:inline-block;font-size:14px;padding:5px 14px;border-radius:999px;
+     border:1px solid var(--line);color:var(--muted);margin-bottom:12px}
+ul{padding-left:20px;max-width:66ch}
+li{margin-bottom:6px}
+a{color:var(--left)}
+
+/* экран теста */
+#screen{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;
+        z-index:50;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+.heads{display:flex;justify-content:space-between;gap:12px;padding:18px 20px 0}
+.head{width:44%;font-weight:600;line-height:1.25;font-size:clamp(15px,2.4vw,20px)}
+.head.l{text-align:left;color:var(--left)}
+.head.r{text-align:right;color:var(--right)}
+.head .key{display:block;font-family:var(--font-mono);font-size:13px;color:var(--muted);
+           margin-top:4px;text-transform:none;letter-spacing:0}
+.head .or{display:block;font-size:13px;color:var(--muted);font-weight:400;margin:2px 0}
+.stage{flex:1;display:flex;align-items:center;justify-content:center;position:relative;
+       padding:16px}
+#stim{font-family:var(--font-display);font-size:clamp(30px,8vw,64px);font-weight:700;
+      text-align:center;text-wrap:balance}
+#xmark{position:absolute;bottom:18%;font-size:44px;color:var(--right);font-weight:700;
+       font-family:var(--font-ui)}
+.taps{display:flex;gap:10px;padding:0 16px 18px}
+.tap{flex:1;border:1px dashed var(--line);border-radius:10px;padding:16px;
+     text-align:center;color:var(--muted);font-size:14px;background:transparent;
+     font-weight:500}
+.tap.l{color:var(--left)}
+.tap.r{color:var(--right)}
+.bar{height:4px;background:var(--line);margin:0 20px 10px;border-radius:2px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ink);width:0}
+.blockinfo{padding:0 20px 14px;font-size:14px;color:var(--muted);
+           display:flex;justify-content:space-between;gap:12px}
+#pause{position:absolute;inset:0;background:var(--bg);display:flex;align-items:center;
+       justify-content:center;padding:24px}
+#pause .inner{max-width:560px}
+@media (min-width:760px){.taps{display:none}}
+.res{font-family:Arial, var(--font-ui);font-size:clamp(64px,16vw,124px);font-weight:700;
+     font-variant-numeric:tabular-nums;margin:2px 0 8px;color:var(--accent);
+     line-height:1}
+table{border-collapse:collapse;width:100%;font-size:15px;
+      font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line)}
+th{color:var(--muted);font-weight:500}
+.scroller{overflow-x:auto}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap" id="intro">
+  <span class="tag">Учебная версия</span>
+  <h1>Тест скрытых ассоциаций</h1>
+  <p class="lede">Методика измеряет, насколько быстро вы связываете одни понятия с другими.
+     Не убеждения и не поступки. Скорость.</p>
+
+  <div class="card">
+    <h2 style="margin-top:0">Здесь нет правильных ответов о вас</h2>
+    <p>Тест не спрашивает ваше мнение и не оценивает его. Он измеряет одно — скорость.</p>
+    <p>На экране появляется слово, и вы относите его к категории слева или справа.
+       У каждого слова есть верная категория, но это простой факт, а не мнение:
+       «Мария» относится к женским именам, «приказ» к словам про руководство.
+       Промах нужен только чтобы удержать внимание на задаче, в результат он не идёт.</p>
+    <p><b>Измеряется вот что.</b> В одном блоке женские имена и слова про руководство
+       лежат на одной клавише. В другом блоке на той же клавише оказываются мужские
+       имена и руководство. Если одна из этих пар для вас привычнее, рука отвечает
+       быстрее на десятки миллисекунд. Разница между блоками и есть результат.</p>
+    <p class="note">Поэтому отвечайте быстро, не обдумывая. Медленные аккуратные ответы
+       стирают тот самый эффект, который тест ловит.</p>
+  </div>
+
+  <div class="card">
+    <h2 style="margin-top:0">Управление</h2>
+    <div class="grid2">
+      <div>
+        <p style="margin:0 0 6px"><b>Компьютер</b></p>
+        <p class="note" style="margin:0">Клавиша <b>E</b> — левая категория.
+           Клавиша <b>I</b> — правая. Раскладка не важна, русские
+           <b>У</b> и <b>Ш</b> тоже работают.</p>
+      </div>
+      <div>
+        <p style="margin:0 0 6px"><b>Телефон</b></p>
+        <p class="note" style="margin:0">Нажимайте на левую половину экрана для левой
+           категории и на правую для правой. Разворачивать экран не нужно.</p>
+      </div>
+    </div>
+  </div>
+
+  <h2>Выберите тест</h2>
+  <div class="grid2">
+    <div class="card" style="margin:0">
+      <h2 style="margin:0 0 6px;font-size:20px">Гендер и руководство</h2>
+      <p class="note" style="margin-bottom:14px">Мужские и женские имена против слов,
+         связанных с руководством и с семьёй.</p>
+      <button data-test="gender">Пройти тест</button>
+    </div>
+    <div class="card" style="margin:0">
+      <h2 style="margin:0 0 6px;font-size:20px">Происхождение и роль</h2>
+      <p class="note" style="margin-bottom:14px">Фамилии, распространённые в России и за
+         рубежом, против слов «руководитель» и «исполнитель».</p>
+      <button data-test="origin">Пройти тест</button>
+    </div>
+  </div>
+
+  <h2>Что вы увидите в конце</h2>
+  <div class="card">
+    <ul class="marks" style="margin:0">
+      <li>Число <b>D</b> со знаком. Ноль означает, что оба сочетания даются одинаково
+          быстро.</li>
+      <li>Какая из двух связок оказалась у вас быстрее и на сколько миллисекунд.</li>
+      <li>Таблицу средних времён реакции по блокам, чтобы было видно, откуда взялось
+          число.</li>
+      <li>Сколько реакций учтено и сколько ошибок пришлось исправить.</li>
+    </ul>
+  </div>
+
+  <h2>Что нужно знать до начала</h2>
+  <ul class="marks">
+    <li>Результат показывает скорость ассоциаций, а не ваши взгляды и не то, как вы
+        поступаете с людьми. Это не диагноз.</li>
+    <li>Одно измерение неустойчиво. У одного и того же человека результат меняется
+        от раза к разу.</li>
+    <li>Ответы никуда не отправляются и нигде не сохраняются. Всё считается в браузере
+        и исчезает, когда вы закроете вкладку.</li>
+    <li>Займёт около семи минут. Отвечайте быстро, ошибки неизбежны и учтены в подсчёте.</li>
+  </ul>
+
+  <h2>Откуда методика</h2>
+  <div class="card">
+    <dl class="spec">
+      <dt>Методика</dt><dd>Гринвальд Э. Г., Макги Д. Е., Шварц Дж. Л. К. Journal of
+        Personality and Social Psychology, 1998, т. 74, № 6, с. 1464–1480</dd>
+      <dt>Подсчёт</dt><dd>Гринвальд Э. Г., Носек Б. А., Банаджи М. Р. Journal of
+        Personality and Social Psychology, 2003, т. 85, № 2, с. 197–216</dd>
+      <dt>Процедура</dt><dd>Носек Б. А., Гринвальд Э. Г., Банаджи М. Р. Понимание и
+        применение ИАТ, ч. II</dd>
+      <dt>Оригинал</dt><dd><a href="https://implicit.harvard.edu/implicit/takeatest.html"
+        target="_blank" rel="noopener">Project Implicit, Harvard University</a></dd>
+    </dl>
+    <p class="note" style="margin:14px 0 0">Русскоязычной версии у Project Implicit нет.
+      Эта страница воспроизводит процедуру и подсчёт по опубликованным работам, но сама
+      она не проходила проверку на надёжность и валидность. Учебная демонстрация для
+      проекта «Лидеры как носители гендерных и этнических стереотипов».</p>
+  </div>
+</div>
+
+<div id="screen" hidden>
+  <div class="heads">
+    <div class="head l" id="headL"></div>
+    <div class="head r" id="headR"></div>
+  </div>
+  <div class="stage">
+    <div id="stim"></div>
+    <div id="xmark" hidden>✕</div>
+    <div id="pause" hidden><div class="inner" id="pauseText"></div></div>
+  </div>
+  <div class="bar"><i id="prog"></i></div>
+  <div class="blockinfo"><span id="blockLbl"></span><span id="trialLbl"></span></div>
+  <div class="taps">
+    <div class="tap l">Левая половина<br>= левая категория</div>
+    <div class="tap r">Правая половина<br>= правая категория</div>
+  </div>
+</div>
+
+<div class="wrap" id="results" hidden></div>
+
+<script>
+(function(){
+"use strict";
+
+var TESTS = {
+  gender: {
+    name: "Гендер и руководство",
+    t1:{label:"Мужские имена", items:["Алексей","Дмитрий","Сергей","Иван","Николай"]},
+    t2:{label:"Женские имена", items:["Елена","Ольга","Наталья","Мария","Анна"]},
+    a1:{label:"Руководство", items:["приказ","стратегия","совещание","решение","подчинённые"]},
+    a2:{label:"Семья",       items:["дом","дети","родня","уют","забота"]},
+    pairing:"«Мужские имена + Руководство» против «Женские имена + Руководство»"
+  },
+  origin: {
+    name: "Происхождение и роль",
+    t1:{label:"Фамилии, распространённые в России",
+        items:["Петров","Смирнов","Кузнецов","Соколов","Волков"]},
+    t2:{label:"Фамилии, распространённые за рубежом",
+        items:["Шмидт","Дюбуа","Росси","Накамура","Андерсен"]},
+    a1:{label:"Руководитель", items:["начальник","директор","глава","лидер","шеф"]},
+    a2:{label:"Исполнитель",  items:["сотрудник","помощник","стажёр","подчинённый","ассистент"]},
+    pairing:"«Фамилии из России + Руководитель» против «Фамилии из-за рубежа + Руководитель»"
+  }
+};
+
+// Структура блоков по Носеку, Гринвальду и Банаджи.
+// kind: t = только цели, a = только атрибуты, c = комбинированный.
+// score: номер пары блоков для подсчёта D (1 = тренировочные, 2 = зачётные).
+var PLAN = [
+  {kind:"t", n:16, swap:false, score:0},
+  {kind:"a", n:16, swap:false, score:0},
+  {kind:"c", n:16, swap:false, score:1},
+  {kind:"c", n:32, swap:false, score:2},
+  {kind:"t", n:32, swap:true,  score:0},
+  {kind:"c", n:16, swap:true,  score:1},
+  {kind:"c", n:32, swap:true,  score:2}
+];
+
+var cfg=null, flip=false, blocks=[], bi=0, ti=0, trials=[], data=[],
+    t0=0, awaiting=false, errShown=false, corrections=0;
+
+var $=function(id){return document.getElementById(id)};
+var intro=$("intro"), screen=$("screen"), results=$("results");
+
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));
+  var t=a[i];a[i]=a[j];a[j]=t}return a}
+
+// какая категория слева в данном блоке
+function sides(b){
+  var t1=cfg.t1,t2=cfg.t2,a1=cfg.a1,a2=cfg.a2;
+  var tLeft = b.swap ? t2 : t1, tRight = b.swap ? t1 : t2;
+  var aLeft = flip ? a2 : a1, aRight = flip ? a1 : a2;
+  return {tLeft:tLeft,tRight:tRight,aLeft:aLeft,aRight:aRight};
+}
+
+function buildTrials(b){
+  var s=sides(b), pool=[], i;
+  function push(cat,side){for(i=0;i<cat.items.length;i++)
+    pool.push({word:cat.items[i],side:side,cat:cat.label})}
+  if(b.kind!=="a"){push(s.tLeft,"L");push(s.tRight,"R")}
+  if(b.kind!=="t"){push(s.aLeft,"L");push(s.aRight,"R")}
+  var out=[];
+  while(out.length<b.n){shuffle(pool);for(i=0;i<pool.length&&out.length<b.n;i++){
+    if(out.length&&out[out.length-1].word===pool[i].word)continue;
+    out.push(pool[i])}}
+  return out;
+}
+
+function headHTML(b){
+  var s=sides(b);
+  var L,R;
+  if(b.kind==="t"){L=s.tLeft.label;R=s.tRight.label}
+  else if(b.kind==="a"){L=s.aLeft.label;R=s.aRight.label}
+  else{L=s.tLeft.label+"<span class='or'>или</span>"+s.aLeft.label;
+       R=s.tRight.label+"<span class='or'>или</span>"+s.aRight.label}
+  $("headL").innerHTML=L+"<span class='key'>клавиша E</span>";
+  $("headR").innerHTML=R+"<span class='key'>клавиша I</span>";
+}
+
+function instr(b,idx){
+  var s=sides(b), h;
+  if(b.kind==="c"){
+    h="<h2 style='margin-top:0'>Блок "+(idx+1)+" из 7. Две категории на одной клавише</h2>"+
+      "<p><b>E</b> — "+s.tLeft.label+" и "+s.aLeft.label+".<br>"+
+      "<b>I</b> — "+s.tRight.label+" и "+s.aRight.label+".</p>";
+  }else if(b.kind==="t"){
+    h="<h2 style='margin-top:0'>Блок "+(idx+1)+" из 7"+(b.swap?". Категории поменялись местами":"")+"</h2>"+
+      "<p><b>E</b> — "+s.tLeft.label+".<br><b>I</b> — "+s.tRight.label+".</p>";
+  }else{
+    h="<h2 style='margin-top:0'>Блок "+(idx+1)+" из 7</h2>"+
+      "<p><b>E</b> — "+s.aLeft.label+".<br><b>I</b> — "+s.aRight.label+".</p>";
+  }
+  h+="<p class='note'>Отвечайте как можно быстрее. При ошибке появится ✕, нажмите верную клавишу.</p>"+
+     "<p><button id='go'>Начать блок</button></p>";
+  return h;
+}
+
+function showPause(html){
+  $("pause").hidden=false; $("pauseText").innerHTML=html;
+  $("stim").textContent=""; $("xmark").hidden=true;
+  var g=$("go"); if(g) g.addEventListener("click",startBlock);
+}
+
+function startTest(key){
+  cfg=TESTS[key]; cfg.key=key; flip=Math.random()<0.5; blocks=PLAN.slice();
+  if(Math.random()<0.5){ // контрбаланс порядка сочетаний
+    blocks=blocks.map(function(b){return {kind:b.kind,n:b.n,swap:!b.swap,score:b.score}});
+  }
+  bi=0; data=[]; corrections=0;
+  intro.hidden=true; results.hidden=true; screen.hidden=false;
+  headHTML(blocks[0]); showPause(instr(blocks[0],0));
+}
+
+function startBlock(){
+  var b=blocks[bi];
+  trials=buildTrials(b); ti=0;
+  headHTML(b);
+  $("blockLbl").textContent="Блок "+(bi+1)+" из 7";
+  $("pause").hidden=true;
+  nextTrial();
+}
+
+function nextTrial(){
+  if(ti>=trials.length){ endBlock(); return }
+  var tr=trials[ti];
+  $("stim").textContent=tr.word;
+  $("xmark").hidden=true; errShown=false;
+  $("trialLbl").textContent=(ti+1)+" / "+trials.length;
+  var done=0,tot=0;
+  for(var i=0;i<blocks.length;i++){tot+=blocks[i].n; if(i<bi)done+=blocks[i].n}
+  $("prog").style.width=Math.round((done+ti)/tot*100)+"%";
+  t0=performance.now(); awaiting=true;
+}
+
+function respond(side){
+  if(!awaiting) return;
+  var tr=trials[ti];
+  if(side!==tr.side){
+    if(!errShown){errShown=true; corrections++}
+    $("xmark").hidden=false;
+    return;
+  }
+  var rt=performance.now()-t0;
+  awaiting=false;
+  data.push({block:bi, score:blocks[bi].score, swap:blocks[bi].swap,
+             rt:rt, corrected:errShown});
+  ti++;
+  setTimeout(nextTrial,260);
+}
+
+function endBlock(){
+  bi++;
+  if(bi>=blocks.length){ finish(); return }
+  headHTML(blocks[bi]);
+  showPause(instr(blocks[bi],bi));
+}
+
+document.addEventListener("keydown",function(e){
+  if(screen.hidden) return;
+  var k=e.key.toLowerCase();
+  if(k==="e"||k==="у"){respond("L");e.preventDefault()}
+  else if(k==="i"||k==="ш"){respond("R");e.preventDefault()}
+});
+$("screen").addEventListener("pointerdown",function(e){
+  if($("pause").hidden===false) return;
+  var r=screen.getBoundingClientRect();
+  respond(e.clientX-r.left < r.width/2 ? "L" : "R");
+});
+
+function mean(a){var s=0;for(var i=0;i<a.length;i++)s+=a[i];return s/a.length}
+function sd(a){var m=mean(a),s=0;for(var i=0;i<a.length;i++)s+=(a[i]-m)*(a[i]-m);
+  return Math.sqrt(s/(a.length-1))}
+
+function finish(){
+  // исключения: реакции дольше 10 000 мс отбрасываем
+  var kept=data.filter(function(d){return d.rt<=10000});
+  var fast=kept.filter(function(d){return d.rt<300}).length;
+  var tooFast = kept.length ? (fast/kept.length>0.10) : false;
+
+  // блоки score=1 (тренировочные) и score=2 (зачётные), swap=false против swap=true
+  function set(score,swap){return kept.filter(function(d){
+    return d.score===score && d.swap===swap}).map(function(d){return d.rt})}
+
+  var parts=[], detail=[];
+  [1,2].forEach(function(sc){
+    var A=set(sc,false), B=set(sc,true);
+    if(A.length<4||B.length<4) return;
+    var all=A.concat(B), s=sd(all);
+    if(!s) return;
+    var d=(mean(B)-mean(A))/s;
+    parts.push(d);
+    detail.push({pair:sc, a:mean(A), b:mean(B), sd:s, d:d, n:all.length});
+  });
+
+  var D = parts.length ? mean(parts) : null;
+  render(D, detail, kept.length, corrections, tooFast);
+}
+
+function render(D, detail, n, corr, tooFast){
+  screen.hidden=true; results.hidden=false;
+  var s=sides({kind:"c",swap:false});
+  var comboA = s.tLeft.label+" + "+s.aLeft.label;
+  var comboB = s.tRight.label+" + "+s.aLeft.label;
+
+  var html="<span class='tag'>Результат</span>"+
+    "<h1>"+cfg.name+"</h1>";
+
+  if(D===null){
+    html+="<p class='lede'>Данных не хватило для подсчёта. Такое бывает, если тест был "+
+          "прерван. Попробуйте пройти его заново.</p>";
+  }else{
+    var faster = D>0 ? comboA : comboB;
+    var diff = detail.length ? Math.abs(mean(detail.map(function(x){return x.b-x.a}))) : 0;
+    html+="<p class='note' style='margin-bottom:0'>D-мера</p>"+
+      "<div class='res'>"+(D>0?"+":"")+D.toFixed(2)+"</div>"+
+      "<p class='lede'>Быстрее вы отвечали, когда на одной клавише были <b>"+faster+"</b>. "+
+      "Разница в среднем времени реакции составила около "+Math.round(diff)+" мс.</p>"+
+      "<div class='card'><p style='margin:0'>Ноль означал бы, что оба сочетания даются "+
+      "одинаково быстро. Чем дальше значение от нуля, тем сильнее расходится скорость. "+
+      "Знак показывает только направление, а не «хорошо» или «плохо».</p></div>";
+  }
+
+  html+="<h2>Как это посчитано</h2>"+
+    "<p>Разность средних времён реакции между двумя сочетаниями делится на стандартное "+
+    "отклонение времён того же человека по обоим сочетаниям. Считается отдельно по "+
+    "тренировочной и по зачётной паре блоков, затем берётся среднее. Реакции дольше "+
+    "10 000 мс отброшены. Ошибочные ответы исправлялись на месте, и время исправления "+
+    "вошло в замер.</p>";
+
+  if(detail.length){
+    html+="<div class='scroller'><table><tr><th>Пара блоков</th><th>"+comboA+
+      "</th><th>"+comboB+"</th><th>SD</th><th>D</th></tr>";
+    detail.forEach(function(x){
+      html+="<tr><td>"+(x.pair===1?"тренировочная":"зачётная")+"</td><td>"+
+        Math.round(x.a)+" мс</td><td>"+Math.round(x.b)+" мс</td><td>"+
+        Math.round(x.sd)+"</td><td>"+(x.d>0?"+":"")+x.d.toFixed(2)+"</td></tr>";
+    });
+    html+="</table></div>";
+  }
+
+  html+="<dl class='spec' style='margin-top:16px'>"+
+    "<dt>Учтено реакций</dt><dd>"+n+"</dd>"+
+    "<dt>Исправленных ошибок</dt><dd>"+corr+"</dd></dl>";
+
+  if(tooFast){
+    html+="<div class='card'><p style='margin:0'>Больше десятой части ответов быстрее "+
+      "300 мс. В исследованиях такие протоколы обычно исключают, потому что при такой "+
+      "скорости человек чаще всего не успевает прочитать слово. Результат ниже считайте "+
+      "недостоверным.</p></div>";
+  }
+
+  html+="<h2>Что это значит простыми словами</h2>"+
+    "<div class='card'>"+
+    "<p>Вы прекрасно знаете, к какой категории относится каждое слово. Разница была "+
+    "только в скорости.</p>"+
+    "<p>Когда два понятия в голове лежат рядом, рука жмёт клавишу быстрее. Когда их "+
+    "приходится держать врозь, вы тормозите на доли секунды. Ваш результат показывает, "+
+    "какая из двух пар лежит ближе.</p>"+
+    "<p style='margin:0'><b>Это не про ваши взгляды.</b> Связь складывается сама, "+
+    (cfg.key==="gender"
+      ? "от того, кого вы чаще видите начальником: в новостях, в кино, на работе, "+
+        "в учебниках. "
+      : "от того, чьи фамилии вы чаще встречаете в списке руководства, а чьи в списке "+
+        "исполнителей. ")+
+    "Голова просто запоминает, что встречается вместе. Такую привычную связь психологи "+
+    "и называют стереотипом. Не мнение, а заученное сочетание.</p></div>";
+
+  html+="<h2>Зачем это знать</h2>"+
+    "<p>Связь срабатывает быстрее, чем вы успеваете подумать. Значит, решением «буду "+
+    "судить справедливо» её не отключить. Меняют не человека, а порядок работы.</p>"+
+    "<p>Пример. До 1970-х годов в американские оркестры женщин брали редко. Потом "+
+    "музыкантов стали прослушивать за ширмой, чтобы комиссия не видела, кто играет. "+
+    "Женщин сразу начали отбирать заметно чаще. Никого не переубеждали, просто убрали "+
+    "лишнюю информацию из процедуры. Это исследование Голдин и Рауз 2000 года.</p>";
+
+  html+="<h2>Чего этот результат не значит</h2><ul class='marks'>"+
+    "<li>Он не говорит, что вы предвзяты. Он говорит, что одна связка натренирована "+
+    "сильнее другой.</li>"+
+    "<li>Он не измеряет ваши убеждения и не предсказывает ваши поступки.</li>"+
+    "<li>Одно прохождение неустойчиво. Пройдите ещё раз и увидите другое число.</li>"+
+    "<li>Эта страница воспроизводит опубликованную процедуру, но сама не проходила "+
+    "проверку на надёжность и валидность.</li></ul>"+
+    "<p><button class='ghost' id='again'>Пройти другой тест</button></p>";
+
+  results.innerHTML=html;
+  window.scrollTo(0,0);
+  $("again").addEventListener("click",function(){
+    results.hidden=true; intro.hidden=false; window.scrollTo(0,0);
+  });
+}
+
+var btns=document.querySelectorAll("[data-test]");
+for(var i=0;i<btns.length;i++){
+  btns[i].addEventListener("click",function(e){
+    startTest(e.currentTarget.getAttribute("data-test"));
+  });
+}
+})();
+</script>
