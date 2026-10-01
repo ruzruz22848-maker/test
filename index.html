@@ -18,24 +18,16 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 /* Макет: приборная панель. Экран теста — герой страницы; вокруг него узкая колонка пояснений. */
+/* Одна тема, тёмная, те же цвета, что в презентации. Светлого варианта нет
+   сознательно: страница должна читаться как её продолжение. */
 :root{
-  --bg:#F4F6F7; --surface:#FFFFFF; --ink:#101A2B; --muted:#5A6B7C;
-  --line:#CFD8DE; --sand:#C9B48D; --accent:#9C2A21;
-  --left:#1F5F73; --right:#8A3A2E;
+  --bg:#0D1626; --surface:#142033; --ink:#F2F5F8; --muted:#9FAFBF;
+  --line:#2A3A4E; --sand:#E8CDA0; --accent:#E0A44A;
+  --left:#E0A44A; --right:#7FB2D9;
   --font-display:'PT Serif', Cambria, Georgia, serif;
   --font-ui:'IBM Plex Sans', Calibri, 'Segoe UI', system-ui, sans-serif;
   --font-mono:'IBM Plex Mono', ui-monospace, 'Courier New', monospace;
-  color-scheme:light;
-}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#101A2B; --surface:#182538; --ink:#EAEFF3; --muted:#9FB0BE;
-  --line:#2C3C50; --sand:#D6C29C; --accent:#E2685A;
-  --left:#6FBDD2; --right:#E2897A; color-scheme:dark;
-}}
-:root[data-theme="dark"]{
-  --bg:#101A2B; --surface:#182538; --ink:#EAEFF3; --muted:#9FB0BE;
-  --line:#2C3C50; --sand:#D6C29C; --accent:#E2685A;
-  --left:#6FBDD2; --right:#E2897A; color-scheme:dark;
+  color-scheme:dark;
 }
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--font-ui);
@@ -87,12 +79,19 @@ a{color:var(--left)}
       text-align:center;text-wrap:balance}
 #xmark{position:absolute;bottom:18%;font-size:44px;color:var(--right);font-weight:700;
        font-family:var(--font-ui)}
+/* Кнопки ответа. Это основной способ отвечать, поэтому они крупные и видны
+   всегда, в том числе на компьютере. */
 .taps{display:flex;gap:10px;padding:0 16px 18px}
-.tap{flex:1;border:1px dashed var(--line);border-radius:10px;padding:16px;
-     text-align:center;color:var(--muted);font-size:14px;background:transparent;
-     font-weight:500}
-.tap.l{color:var(--left)}
-.tap.r{color:var(--right)}
+.tap{flex:1;min-height:92px;border:1px solid var(--line);border-radius:14px;
+     padding:14px 12px;text-align:center;font-size:clamp(14px,3.4vw,17px);
+     font-family:var(--font-ui);font-weight:600;line-height:1.25;
+     background:var(--surface);color:var(--ink);cursor:pointer;
+     -webkit-tap-highlight-color:transparent;touch-action:manipulation;
+     user-select:none}
+.tap:active{background:#1B2A42}
+.tap.l{border-color:var(--left);color:var(--left)}
+.tap.r{border-color:var(--right);color:var(--right)}
+.tap .or{display:block;font-size:12px;color:var(--muted);font-weight:400;margin:2px 0}
 .bar{height:4px;background:var(--line);margin:0 20px 10px;border-radius:2px;overflow:hidden}
 .bar i{display:block;height:100%;background:var(--ink);width:0}
 .blockinfo{padding:0 20px 14px;font-size:14px;color:var(--muted);
@@ -100,7 +99,6 @@ a{color:var(--left)}
 #pause{position:absolute;inset:0;background:var(--bg);display:flex;align-items:center;
        justify-content:center;padding:24px}
 #pause .inner{max-width:560px}
-@media (min-width:760px){.taps{display:none}}
 .res{font-family:Arial, var(--font-ui);font-size:clamp(64px,16vw,124px);font-weight:700;
      font-variant-numeric:tabular-nums;margin:2px 0 8px;color:var(--accent);
      line-height:1}
@@ -126,7 +124,7 @@ th{color:var(--muted);font-weight:500}
        «Мария» относится к женским именам, «приказ» к словам про руководство.
        Промах нужен только чтобы удержать внимание на задаче, в результат он не идёт.</p>
     <p><b>Измеряется вот что.</b> В одном блоке женские имена и слова про руководство
-       лежат на одной клавише. В другом блоке на той же клавише оказываются мужские
+       лежат на одной кнопке. В другом блоке на той же кнопке оказываются мужские
        имена и руководство. Если одна из этих пар для вас привычнее, рука отвечает
        быстрее на десятки миллисекунд. Разница между блоками и есть результат.</p>
     <p class="note">Поэтому отвечайте быстро, не обдумывая. Медленные аккуратные ответы
@@ -135,19 +133,9 @@ th{color:var(--muted);font-weight:500}
 
   <div class="card">
     <h2 style="margin-top:0">Управление</h2>
-    <div class="grid2">
-      <div>
-        <p style="margin:0 0 6px"><b>Компьютер</b></p>
-        <p class="note" style="margin:0">Клавиша <b>E</b> — левая категория.
-           Клавиша <b>I</b> — правая. Раскладка не важна, русские
-           <b>У</b> и <b>Ш</b> тоже работают.</p>
-      </div>
-      <div>
-        <p style="margin:0 0 6px"><b>Телефон</b></p>
-        <p class="note" style="margin:0">Нажимайте на левую половину экрана для левой
-           категории и на правую для правой. Разворачивать экран не нужно.</p>
-      </div>
-    </div>
+    <p class="note" style="margin:0">Внизу экрана две кнопки с названиями категорий.
+       Нажимайте ту, к которой относится слово. Разворачивать телефон не нужно,
+       клавиатура не нужна.</p>
   </div>
 
   <h2>Выберите тест</h2>
@@ -159,9 +147,9 @@ th{color:var(--muted);font-weight:500}
       <button data-test="gender">Пройти тест</button>
     </div>
     <div class="card" style="margin:0">
-      <h2 style="margin:0 0 6px;font-size:20px">Происхождение и роль</h2>
-      <p class="note" style="margin-bottom:14px">Фамилии, распространённые в России и за
-         рубежом, против слов «руководитель» и «исполнитель».</p>
+      <h2 style="margin:0 0 6px;font-size:20px">Фамилия и роль</h2>
+      <p class="note" style="margin-bottom:14px">Русские и среднеазиатские фамилии против
+         слов «руководитель» и «исполнитель».</p>
       <button data-test="origin">Пройти тест</button>
     </div>
   </div>
@@ -186,7 +174,8 @@ th{color:var(--muted);font-weight:500}
         от раза к разу.</li>
     <li>Ответы никуда не отправляются и нигде не сохраняются. Всё считается в браузере
         и исчезает, когда вы закроете вкладку.</li>
-    <li>Займёт около семи минут. Отвечайте быстро, ошибки неизбежны и учтены в подсчёте.</li>
+    <li>Займёт около четырёх минут. Отвечайте быстро, ошибки неизбежны и учтены
+        в подсчёте.</li>
   </ul>
 
   <h2>Откуда методика</h2>
@@ -221,8 +210,8 @@ th{color:var(--muted);font-weight:500}
   <div class="bar"><i id="prog"></i></div>
   <div class="blockinfo"><span id="blockLbl"></span><span id="trialLbl"></span></div>
   <div class="taps">
-    <div class="tap l">Левая половина<br>= левая категория</div>
-    <div class="tap r">Правая половина<br>= правая категория</div>
+    <button class="tap l" id="tapL" type="button"></button>
+    <button class="tap r" id="tapR" type="button"></button>
   </div>
 </div>
 
@@ -242,28 +231,39 @@ var TESTS = {
     pairing:"«Мужские имена + Руководство» против «Женские имена + Руководство»"
   },
   origin: {
-    name: "Происхождение и роль",
-    t1:{label:"Фамилии, распространённые в России",
-        items:["Петров","Смирнов","Кузнецов","Соколов","Волков"]},
-    t2:{label:"Фамилии, распространённые за рубежом",
-        items:["Шмидт","Дюбуа","Росси","Накамура","Андерсен"]},
+    // Итальянские и французские фамилии заменены. Для российской аудитории
+    // значим не иностранец вообще, а привычность фамилии русскому языку.
+    // Коренные народы России сюда не берём: у Григорьева, Фиск и Батхиной
+    // чукчи, коми и буряты стоят в середине карты, а узбеки и таджики в нижнем
+    // углу, то есть это разные позиции и смешивать их в одну категорию нельзя.
+    name: "Фамилия и роль",
+    t1:{label:"Русские фамилии",
+        items:["Иванов","Смирнов","Кузнецов","Попов","Васильев"]},
+    // Русифицированные формы на -ов и -ев сюда не годятся: Рахимов, Назаров
+    // и подобные неотличимы от русских по строению слова, и контраст пропадает.
+    // Берём суффиксы, которых в русском нет: -зода (Таджикистан),
+    // -улы (Казахстан), -уулу (Киргизия).
+    t2:{label:"Среднеазиатские фамилии",
+        items:["Рахимзода","Сафарзода","Жумабекулы","Нурланулы","Асанбекуулу"]},
     a1:{label:"Руководитель", items:["начальник","директор","глава","лидер","шеф"]},
     a2:{label:"Исполнитель",  items:["сотрудник","помощник","стажёр","подчинённый","ассистент"]},
-    pairing:"«Фамилии из России + Руководитель» против «Фамилии из-за рубежа + Руководитель»"
+    pairing:"«Русские фамилии + Руководитель» против «Среднеазиатские фамилии + Руководитель»"
   }
 };
 
 // Структура блоков по Носеку, Гринвальду и Банаджи.
 // kind: t = только цели, a = только атрибуты, c = комбинированный.
 // score: номер пары блоков для подсчёта D (1 = тренировочные, 2 = зачётные).
+// Укорочено: было 160 проб, стало 108. Критические блоки урезаны с 32 до 20,
+// это нижняя граница краткой версии ИАТ, ниже D-мера становится шумной.
 var PLAN = [
-  {kind:"t", n:16, swap:false, score:0},
-  {kind:"a", n:16, swap:false, score:0},
-  {kind:"c", n:16, swap:false, score:1},
-  {kind:"c", n:32, swap:false, score:2},
-  {kind:"t", n:32, swap:true,  score:0},
-  {kind:"c", n:16, swap:true,  score:1},
-  {kind:"c", n:32, swap:true,  score:2}
+  {kind:"t", n:12, swap:false, score:0},
+  {kind:"a", n:12, swap:false, score:0},
+  {kind:"c", n:12, swap:false, score:1},
+  {kind:"c", n:20, swap:false, score:2},
+  {kind:"t", n:20, swap:true,  score:0},
+  {kind:"c", n:12, swap:true,  score:1},
+  {kind:"c", n:20, swap:true,  score:2}
 ];
 
 var cfg=null, flip=false, blocks=[], bi=0, ti=0, trials=[], data=[],
@@ -303,24 +303,26 @@ function headHTML(b){
   else if(b.kind==="a"){L=s.aLeft.label;R=s.aRight.label}
   else{L=s.tLeft.label+"<span class='or'>или</span>"+s.aLeft.label;
        R=s.tRight.label+"<span class='or'>или</span>"+s.aRight.label}
-  $("headL").innerHTML=L+"<span class='key'>клавиша E</span>";
-  $("headR").innerHTML=R+"<span class='key'>клавиша I</span>";
+  $("headL").innerHTML=L;
+  $("headR").innerHTML=R;
+  $("tapL").innerHTML=L;
+  $("tapR").innerHTML=R;
 }
 
 function instr(b,idx){
   var s=sides(b), h;
   if(b.kind==="c"){
-    h="<h2 style='margin-top:0'>Блок "+(idx+1)+" из 7. Две категории на одной клавише</h2>"+
-      "<p><b>E</b> — "+s.tLeft.label+" и "+s.aLeft.label+".<br>"+
-      "<b>I</b> — "+s.tRight.label+" и "+s.aRight.label+".</p>";
+    h="<h2 style='margin-top:0'>Блок "+(idx+1)+" из 7. Две категории на одной кнопке</h2>"+
+      "<p><b>Слева</b> — "+s.tLeft.label+" и "+s.aLeft.label+".<br>"+
+      "<b>Справа</b> — "+s.tRight.label+" и "+s.aRight.label+".</p>";
   }else if(b.kind==="t"){
     h="<h2 style='margin-top:0'>Блок "+(idx+1)+" из 7"+(b.swap?". Категории поменялись местами":"")+"</h2>"+
-      "<p><b>E</b> — "+s.tLeft.label+".<br><b>I</b> — "+s.tRight.label+".</p>";
+      "<p><b>Слева</b> — "+s.tLeft.label+".<br><b>Справа</b> — "+s.tRight.label+".</p>";
   }else{
     h="<h2 style='margin-top:0'>Блок "+(idx+1)+" из 7</h2>"+
-      "<p><b>E</b> — "+s.aLeft.label+".<br><b>I</b> — "+s.aRight.label+".</p>";
+      "<p><b>Слева</b> — "+s.aLeft.label+".<br><b>Справа</b> — "+s.aRight.label+".</p>";
   }
-  h+="<p class='note'>Отвечайте как можно быстрее. При ошибке появится ✕, нажмите верную клавишу.</p>"+
+  h+="<p class='note'>Отвечайте как можно быстрее. При ошибке появится ✕, нажмите верную кнопку.</p>"+
      "<p><button id='go'>Начать блок</button></p>";
   return h;
 }
@@ -391,6 +393,17 @@ document.addEventListener("keydown",function(e){
   if(k==="e"||k==="у"){respond("L");e.preventDefault()}
   else if(k==="i"||k==="ш"){respond("R");e.preventDefault()}
 });
+// Основной способ ответа на телефоне: две кнопки во всю ширину половины экрана.
+function tap(id,side){
+  $(id).addEventListener("pointerdown",function(e){
+    e.preventDefault(); e.stopPropagation();
+    if($("pause").hidden===false) return;
+    respond(side);
+  });
+}
+tap("tapL","L"); tap("tapR","R");
+
+// Запас: касание по своей половине поля со словом работает так же.
 $("screen").addEventListener("pointerdown",function(e){
   if($("pause").hidden===false) return;
   var r=screen.getBoundingClientRect();
@@ -443,7 +456,7 @@ function render(D, detail, n, corr, tooFast){
     var diff = detail.length ? Math.abs(mean(detail.map(function(x){return x.b-x.a}))) : 0;
     html+="<p class='note' style='margin-bottom:0'>D-мера</p>"+
       "<div class='res'>"+(D>0?"+":"")+D.toFixed(2)+"</div>"+
-      "<p class='lede'>Быстрее вы отвечали, когда на одной клавише были <b>"+faster+"</b>. "+
+      "<p class='lede'>Быстрее вы отвечали, когда на одной кнопке были <b>"+faster+"</b>. "+
       "Разница в среднем времени реакции составила около "+Math.round(diff)+" мс.</p>"+
       "<div class='card'><p style='margin:0'>Ноль означал бы, что оба сочетания даются "+
       "одинаково быстро. Чем дальше значение от нуля, тем сильнее расходится скорость. "+
@@ -483,7 +496,7 @@ function render(D, detail, n, corr, tooFast){
     "<div class='card'>"+
     "<p>Вы прекрасно знаете, к какой категории относится каждое слово. Разница была "+
     "только в скорости.</p>"+
-    "<p>Когда два понятия в голове лежат рядом, рука жмёт клавишу быстрее. Когда их "+
+    "<p>Когда два понятия в голове лежат рядом, палец жмёт кнопку быстрее. Когда их "+
     "приходится держать врозь, вы тормозите на доли секунды. Ваш результат показывает, "+
     "какая из двух пар лежит ближе.</p>"+
     "<p style='margin:0'><b>Это не про ваши взгляды.</b> Связь складывается сама, "+
